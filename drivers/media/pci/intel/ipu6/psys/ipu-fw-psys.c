@@ -492,7 +492,7 @@ int ipu_fw_psys_ppg_enqueue_bufs(struct ipu_psys_kcmd *kcmd)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0)
 	if (ipu_ver == IPU_VER_6SE)
 #else
-	if (ipu_ver == IPU6_VER_6SE)
+	if (IPU6_IS_VER_6SE(ipu_ver))
 #endif
 		size = IPU6SE_FW_PSYS_N_PSYS_CMD_QUEUE_ID;
 	else

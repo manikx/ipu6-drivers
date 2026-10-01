@@ -99,7 +99,7 @@ static const struct bus_type ipu_psys_bus = {
 #define PKG_DIR_ENT_LEN_FOR_PSYS	2
 #define PKG_DIR_SIZE_MASK_FOR_PSYS	GENMASK(23, 0)
 
-enum ipu6_version ipu_ver;
+ipu6_ver_t ipu_ver;
 
 static u32 ipu6_cpd_pkg_dir_get_address(const u64 *pkg_dir, int pkg_dir_idx)
 {
@@ -2116,8 +2116,8 @@ static int ipu_psys_fw_init(struct ipu_psys *psys)
 	int i;
 
 	size = IPU6SE_FW_PSYS_N_PSYS_CMD_QUEUE_ID;
-	if (ipu_ver == IPU6_VER_6 || ipu_ver == IPU6_VER_6EP ||
-	    ipu_ver == IPU6_VER_6EP_MTL)
+	if (IPU6_IS_VER_6(ipu_ver) || IPU6_IS_VER_6EP(ipu_ver) ||
+	    IPU6_IS_VER_6EP_MTL(ipu_ver))
 		size = IPU6_FW_PSYS_N_PSYS_CMD_QUEUE_ID;
 
 	queue_cfg = devm_kzalloc(dev, sizeof(*queue_cfg) * size,

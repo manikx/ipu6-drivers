@@ -196,10 +196,11 @@ void ipu_psys_setup_hw(struct ipu_psys *psys)
 		       IPU_REG_DMA_TOP_AB_RING_ACCESS_OFFSET(r5));
 	}
 	psys_iommu0_ctrl = base +
-		psys->pdata->ipdata->hw_variant.mmu_hw[0].offset +
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0)
+		psys->pdata->ipdata->hw_variant.mmu_hw[0].offset +
 		IPU_MMU_INFO_OFFSET;
 #else
+		psys->pdata->ipdata->hw_variant.offset +
 		IPU6_MMU_INFO_OFFSET;
 #endif
 	writel(IPU_INFO_REQUEST_DESTINATION_IOSF, psys_iommu0_ctrl);
@@ -542,7 +543,8 @@ static void ipu_buttress_set_psys_ratio(struct ipu6_device *isp,
 					unsigned int psys_divisor,
 					unsigned int psys_qos_floor)
 {
-	struct ipu6_buttress_ctrl *ctrl = isp->psys->ctrl;
+	/* devm-allocated, mutable despite the const-qualified field type */
+	struct ipu6_buttress_ctrl *ctrl = (struct ipu6_buttress_ctrl *)isp->psys->ctrl;
 
 	mutex_lock(&isp->buttress.power_mutex);
 

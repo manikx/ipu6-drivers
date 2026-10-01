@@ -130,7 +130,29 @@ enum ipu_device_buttress_psys_domain_pos {
 #define IPU_MAX_RESOURCES 128
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 10, 0)
-extern enum ipu6_version ipu_ver;
+/*
+ * Newer in-tree ipu6 headers replaced the old enum ipu6_version/IPU6_VER_*
+ * chip-version scheme with a plain bitmask (IPU_VERSION_* BIT() defines).
+ * Detect which one the vendored/real ipu6.h in use provides (feature-check,
+ * not a kernel-version guess: the switchover doesn't correspond to any
+ * released kernel version yet) and provide a uniform set of accessors so
+ * the rest of the psys code doesn't need to care which scheme is active.
+ */
+#ifdef IPU_VERSION_6SE
+typedef unsigned int ipu6_ver_t;
+#define IPU6_IS_VER_6SE(v)	((v) & IPU_VERSION_6SE)
+#define IPU6_IS_VER_6(v)	((v) & IPU_VERSION_6)
+#define IPU6_IS_VER_6EP(v)	((v) & IPU_VERSION_6EP)
+#define IPU6_IS_VER_6EP_MTL(v)	((v) & IPU_VERSION_6EP_MTL)
+#else
+typedef enum ipu6_version ipu6_ver_t;
+#define IPU6_IS_VER_6SE(v)	((v) == IPU6_VER_6SE)
+#define IPU6_IS_VER_6(v)	((v) == IPU6_VER_6)
+#define IPU6_IS_VER_6EP(v)	((v) == IPU6_VER_6EP)
+#define IPU6_IS_VER_6EP_MTL(v)	((v) == IPU6_VER_6EP_MTL)
+#endif
+
+extern ipu6_ver_t ipu_ver;
 
 #endif
 /* Opaque structure. Do not access fields. */
