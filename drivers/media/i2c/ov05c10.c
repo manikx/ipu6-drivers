@@ -743,6 +743,9 @@ static void ov05c10_update_pad_format(const struct ov05c10_mode *mode,
 }
 
 static int ov05c10_set_format(struct v4l2_subdev *sd,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+			const struct v4l2_subdev_client_info *ci,
+#endif
 			struct v4l2_subdev_state *sd_state,
 			struct v4l2_subdev_format *fmt)
 {
@@ -835,6 +838,9 @@ static int ov05c10_enum_frame_size(struct v4l2_subdev *sd,
 }
 
 static int ov05c10_get_selection(struct v4l2_subdev *sd,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+				const struct v4l2_subdev_client_info *ci,
+#endif
 				struct v4l2_subdev_state *state,
 				struct v4l2_subdev_selection *sel)
 {
@@ -868,7 +874,11 @@ static int ov05c10_init_state(struct v4l2_subdev *sd,
 		},
 	};
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+	ov05c10_set_format(sd, NULL, sd_state, &fmt);
+#else
 	ov05c10_set_format(sd, sd_state, &fmt);
+#endif
 	return 0;
 }
 

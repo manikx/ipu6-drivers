@@ -840,6 +840,16 @@ static int ov01a1s_set_format(struct v4l2_subdev *sd,
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 14, 0)
 			      struct v4l2_subdev_pad_config *cfg,
 #else
+/*
+ * v4l2_subdev_pad_ops.set_fmt() gained a new 'const struct
+ * v4l2_subdev_client_info *ci' parameter in commit 7eef49c164615
+ * ("media: v4l2-subdev: Add struct v4l2_subdev_client_info pointer to
+ * pad ops"), not yet in any released kernel as of this writing (only
+ * in linux-next); update this threshold once it lands in a release.
+ */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+			      const struct v4l2_subdev_client_info *ci,
+#endif
 			      struct v4l2_subdev_state *sd_state,
 #endif
 			      struct v4l2_subdev_format *fmt)

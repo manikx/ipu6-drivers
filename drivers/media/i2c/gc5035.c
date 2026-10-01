@@ -1476,6 +1476,9 @@ out_otp_exit:
 }
 
 static int gc5035_set_fmt(struct v4l2_subdev *sd,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+			  const struct v4l2_subdev_client_info *ci,
+#endif
 			  struct v4l2_subdev_state *sd_state,
 			  struct v4l2_subdev_format *fmt)
 {
@@ -1705,7 +1708,11 @@ static int gc5035_entity_init_cfg(struct v4l2_subdev *subdev,
 		}
 	};
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+	gc5035_set_fmt(subdev, NULL, sd_state, &fmt);
+#else
 	gc5035_set_fmt(subdev, sd_state, &fmt);
+#endif
 
 	return 0;
 }

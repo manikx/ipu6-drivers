@@ -900,6 +900,9 @@ exit:
 }
 
 static int ov02e10_set_format(struct v4l2_subdev *sd,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+			      const struct v4l2_subdev_client_info *ci,
+#endif
 			      struct v4l2_subdev_state *sd_state,
 			      struct v4l2_subdev_format *fmt)
 {

@@ -608,6 +608,9 @@ static int imx471_get_pad_format(struct v4l2_subdev *sd,
 
 static int
 imx471_set_pad_format(struct v4l2_subdev *sd,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 3, 0)
+		      const struct v4l2_subdev_client_info *ci,
+#endif
 		      struct v4l2_subdev_state *sd_state,
 		      struct v4l2_subdev_format *fmt)
 {
@@ -1142,7 +1145,6 @@ error_handler_free:
 error_probe:
 	mutex_destroy(&imx471->mutex);
 
-error_power_off:
 	imx471_power_off(&client->dev);
 
 	return ret;
