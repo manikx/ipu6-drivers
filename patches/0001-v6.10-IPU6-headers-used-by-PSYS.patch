@@ -1,20 +1,20 @@
-From db64359931814740e9e6c4635ffde3e7104c5206 Mon Sep 17 00:00:00 2001
+From 8033028c584fb3926a61e9f37298c33a71d7a8cc Mon Sep 17 00:00:00 2001
 From: Test <test@example.com>
-Date: Thu, 1 Oct 2026 21:14:27 +0530
+Date: Tue, 6 Oct 2026 11:25:22 +0530
 Subject: [PATCH] media: ipu6: Refresh vendored IPU6 headers used by PSYS
 
 ---
- drivers/media/pci/intel/ipu6/ipu6-bus.h       |  59 ++++
- drivers/media/pci/intel/ipu6/ipu6-buttress.h  | 112 ++++++
- drivers/media/pci/intel/ipu6/ipu6-cpd.h       | 148 ++++++++
+ drivers/media/pci/intel/ipu6/ipu6-bus.h       |  59 +++
+ drivers/media/pci/intel/ipu6/ipu6-buttress.h  | 114 ++++++
+ drivers/media/pci/intel/ipu6/ipu6-cpd.h       | 148 +++++++
  drivers/media/pci/intel/ipu6/ipu6-dma.h       |  45 +++
  drivers/media/pci/intel/ipu6/ipu6-fw-com.h    |  47 +++
- drivers/media/pci/intel/ipu6/ipu6-mmu.h       | 214 +++++++++++
- .../intel/ipu6/ipu6-platform-buttress-regs.h  | 333 ++++++++++++++++++
- .../media/pci/intel/ipu6/ipu6-platform-regs.h | 179 ++++++++++
- drivers/media/pci/intel/ipu6/ipu6.h           | 200 +++++++++++
- drivers/media/pci/intel/ipu6/ipu7-mmu-hw.h    | 254 +++++++++++++
- 10 files changed, 1591 insertions(+)
+ drivers/media/pci/intel/ipu6/ipu6-mmu.h       | 215 ++++++++++
+ .../intel/ipu6/ipu6-platform-buttress-regs.h  | 343 ++++++++++++++++
+ .../media/pci/intel/ipu6/ipu6-platform-regs.h | 179 +++++++++
+ drivers/media/pci/intel/ipu6/ipu6.h           | 205 ++++++++++
+ drivers/media/pci/intel/ipu6/ipu7-mmu-hw.h    | 369 ++++++++++++++++++
+ 10 files changed, 1724 insertions(+)
  create mode 100644 drivers/media/pci/intel/ipu6/ipu6-bus.h
  create mode 100644 drivers/media/pci/intel/ipu6/ipu6-buttress.h
  create mode 100644 drivers/media/pci/intel/ipu6/ipu6-cpd.h
@@ -93,10 +93,10 @@ index 0000000..d2f93eb
 +#endif
 diff --git a/drivers/media/pci/intel/ipu6/ipu6-buttress.h b/drivers/media/pci/intel/ipu6/ipu6-buttress.h
 new file mode 100644
-index 0000000..b869e68
+index 0000000..81e0e77
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu6-buttress.h
-@@ -0,0 +1,112 @@
+@@ -0,0 +1,114 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2013--2024 Intel Corporation */
 +
@@ -208,6 +208,8 @@ index 0000000..b869e68
 +void ipu6_buttress_restore(struct ipu6_device *isp);
 +void ipu7_buttress_wakeup_isys(const struct ipu6_device *isp);
 +u32 ipu7_buttress_get_isys_freq(struct ipu6_device *isp);
++void ipu7_buttress_wakeup_psys(const struct ipu6_device *isp);
++u32 ipu7_buttress_get_psys_freq(struct ipu6_device *isp);
 +#endif /* IPU6_BUTTRESS_H */
 diff --git a/drivers/media/pci/intel/ipu6/ipu6-cpd.h b/drivers/media/pci/intel/ipu6/ipu6-cpd.h
 new file mode 100644
@@ -469,10 +471,10 @@ index 0000000..b02285a
 +#endif
 diff --git a/drivers/media/pci/intel/ipu6/ipu6-mmu.h b/drivers/media/pci/intel/ipu6/ipu6-mmu.h
 new file mode 100644
-index 0000000..f867cbb
+index 0000000..432073a
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu6-mmu.h
-@@ -0,0 +1,214 @@
+@@ -0,0 +1,215 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2013--2026 Intel Corporation */
 +
@@ -486,6 +488,7 @@ index 0000000..f867cbb
 +#include "ipu7-mmu-hw.h"
 +
 +struct device;
++struct ipu6_mmu;
 +struct page;
 +struct ipu6_mmu;
 +
@@ -689,10 +692,10 @@ index 0000000..f867cbb
 +#endif
 diff --git a/drivers/media/pci/intel/ipu6/ipu6-platform-buttress-regs.h b/drivers/media/pci/intel/ipu6/ipu6-platform-buttress-regs.h
 new file mode 100644
-index 0000000..57e661c
+index 0000000..4c4ca95
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu6-platform-buttress-regs.h
-@@ -0,0 +1,333 @@
+@@ -0,0 +1,343 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2023--2024 Intel Corporation */
 +
@@ -932,6 +935,8 @@ index 0000000..57e661c
 +#define IPU7_BUTTRESS_REG_PB_TIMESTAMP_VALID	0x2038
 +#define IPU7_BUTTRESS_REG_IS_WORKPOINT_REQ	0x2104
 +#define IPU7_BUTTRESS_REG_PS_WORKPOINT_REQ	0x2100
++#define IPU7_BUTTRESS_REG_PS_WORKPOINT_DOMAIN_REQ	0x2108
++#define IPU7_BUTTRESS_REG_PS_DOMAINS_STATUS	0x2110
 +#define IPU7_BUTTRESS_REG_IDLE_WDT		0x218c
 +#define IPU7_BUTTRESS_REG_ISYS_UCX_CTRL_STATUS	0x2200
 +#define IPU7_BUTTRESS_REG_ISYS_UCX_START_ADDR	0x2204
@@ -975,8 +980,13 @@ index 0000000..57e661c
 +#define IPU7_FREQ_CTL_CDYN			0x80
 +#define IPU7_FREQ_CTL_CDYN_SHIFT		8
 +#define IPU7_BUTTRESS_IS_FREQ_CTL_RATIO_MASK	GENMASK(7, 0)
++#define IPU7_BUTTRESS_PS_FREQ_CTL_RATIO_MASK	GENMASK(7, 0)
++#define IPU7_BUTTRESS_PS_FREQ_RATIO_STEP	25U
 +#define IPU7_IS_FREQ_CTL_DEFAULT_RATIO		0x1b
 +#define IPU7_PS_FREQ_CTL_DEFAULT_RATIO		0x14
++/* IS: 400MHz, PS: 400MHz */
++#define IPU8_IS_FREQ_CTL_DEFAULT_RATIO		0x10
++#define IPU8_PS_FREQ_CTL_DEFAULT_RATIO		0x10
 +
 +/* D2D power control */
 +#define IPU7_BUTTRESS_REG_D2D_CTL		0x21d4
@@ -990,6 +1000,7 @@ index 0000000..57e661c
 +
 +/* NDE */
 +#define IPU7_BUTTRESS_REG_NDE_CONTROL		0x21a4
++#define IPU8_BUTTRESS_REG_NDE_CONTROL		0x21a8
 +#define IPU7_NDE_VAL_MASK			GENMASK(9, 0)
 +#define IPU7_NDE_SCALE_MASK			GENMASK(12, 10)
 +#define IPU7_NDE_VALID_MASK			BIT(13)
@@ -1001,6 +1012,7 @@ index 0000000..57e661c
 +#define IPU7_NDE_SCALE_DEFAULT			2
 +#define IPU7_NDE_VALID_DEFAULT			0
 +#define IPU7_NDE_RESVEC				0xe
++#define IPU8_NDE_RESVEC				0x2
 +
 +/* IS UCX control */
 +#define IPU7_UCX_CTL_RESET			BIT(0)
@@ -1013,6 +1025,7 @@ index 0000000..57e661c
 +#define IPU7_BUTTRESS_OWN_ACK_IS_CLK		BIT(9)
 +#define IPU7_BUTTRESS_OVERRIDE_PS_CLK		BIT(2)
 +#define IPU7_BUTTRESS_OWN_ACK_PS_CLK		BIT(10)
++#define IPU7_BUTTRESS_REG_PS_PLL_ENABLE		0x21bc
 +
 +/* PB registers */
 +#define IPU7_GLOBAL_INTERRUPT_MASK		0x8
@@ -1213,10 +1226,10 @@ index 0000000..b883385
 +#endif /* IPU6_PLATFORM_REGS_H */
 diff --git a/drivers/media/pci/intel/ipu6/ipu6.h b/drivers/media/pci/intel/ipu6/ipu6.h
 new file mode 100644
-index 0000000..72c5063
+index 0000000..00fb78a
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu6.h
-@@ -0,0 +1,200 @@
+@@ -0,0 +1,205 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2013 - 2024 Intel Corporation */
 +
@@ -1237,6 +1250,7 @@ index 0000000..72c5063
 +#define IPU6_MEDIA_DEV_MODEL_NAME	"ipu6"
 +#define IPU7_MEDIA_DEV_MODEL_NAME	"ipu7"
 +#define IPU7P5_MEDIA_DEV_MODEL_NAME	"ipu7.5"
++#define IPU8_MEDIA_DEV_MODEL_NAME	"ipu8"
 +
 +#define IPU6SE_FIRMWARE_NAME		"intel/ipu/ipu6se_fw.bin"
 +#define IPU6EP_FIRMWARE_NAME		"intel/ipu/ipu6ep_fw.bin"
@@ -1245,6 +1259,7 @@ index 0000000..72c5063
 +#define IPU6EPADLN_FIRMWARE_NAME	"intel/ipu/ipu6epadln_fw.bin"
 +#define IPU7_FIRMWARE_NAME		"intel/ipu/ipu7_fw.bin"
 +#define IPU7P5_FIRMWARE_NAME		"intel/ipu/ipu7ptl_fw.bin"
++#define IPU8_FIRMWARE_NAME		"intel/ipu/ipu8_fw.bin"
 +
 +#define IPU_VERSION_6		BIT(0) /* TGL */
 +#define IPU_VERSION_6SE		BIT(1) /* JSL */
@@ -1252,6 +1267,7 @@ index 0000000..72c5063
 +#define IPU_VERSION_6EP_MTL	BIT(3) /* MTL */
 +#define IPU_VERSION_7		BIT(4) /* LNL */
 +#define IPU_VERSION_7P5		BIT(5) /* PTL */
++#define IPU_VERSION_8		BIT(6) /* NVL */
 +
 +#define IS_IPU6_TGL(isp)	((isp)->hw_ver & IPU_VERSION_6)
 +#define IS_IPU6SE(isp)		((isp)->hw_ver & IPU_VERSION_6SE)
@@ -1261,6 +1277,7 @@ index 0000000..72c5063
 +				 (IPU_VERSION_7 | IPU_VERSION_7P5))
 +#define IS_IPU7_MTL(isp)	((isp)->hw_ver & IPU_VERSION_7)
 +#define IS_IPU7P5(isp)		((isp)->hw_ver & IPU_VERSION_7P5)
++#define IS_IPU8(isp)		((isp)->hw_ver & IPU_VERSION_8)
 +
 +/*
 + * ISYS DMA can overshoot. For higher resolutions over allocation is one line
@@ -1362,6 +1379,7 @@ index 0000000..72c5063
 +	u32 fw_access_port_ofs;
 +	/* IPU7-specific field */
 +	u32 gpreg;
++	u32 gpreg_stride;
 +};
 +
 +struct ipu6_isys_internal_tpg_pdata {
@@ -1419,10 +1437,10 @@ index 0000000..72c5063
 +#endif /* IPU6_H */
 diff --git a/drivers/media/pci/intel/ipu6/ipu7-mmu-hw.h b/drivers/media/pci/intel/ipu6/ipu7-mmu-hw.h
 new file mode 100644
-index 0000000..ba31ed3
+index 0000000..0d3fd7d
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu7-mmu-hw.h
-@@ -0,0 +1,254 @@
+@@ -0,0 +1,369 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2026 Intel Corporation */
 +
@@ -1637,6 +1655,121 @@ index 0000000..ba31ed3
 +#define IPU7P5_PS_ZLX_DATA_WR_NUM		32
 +#define IPU7P5_PS_ZLX_FW_RD_NUM			16
 +#define IPU7P5_PS_ZLX_FW_WR_NUM			10
++
++/* IPU8 */
++/* IS MMU Cmd RD */
++#define IPU8_IS_MMU_FW_RD_OFFSET		0x270000
++#define IPU8_IS_MMU_FW_RD_STREAM_NUM		3
++#define IPU8_IS_MMU_FW_RD_L1_BLOCKNR_REG	0x54
++#define IPU8_IS_MMU_FW_RD_L2_BLOCKNR_REG	0x60
++
++/* IS MMU Cmd WR */
++#define IPU8_IS_MMU_FW_WR_OFFSET		0x271000
++#define IPU8_IS_MMU_FW_WR_STREAM_NUM		3
++#define IPU8_IS_MMU_FW_WR_L1_BLOCKNR_REG	0x54
++#define IPU8_IS_MMU_FW_WR_L2_BLOCKNR_REG	0x60
++
++/* IS MMU Data WR ISOC */
++#define IPU8_IS_MMU_M0_OFFSET			0x272000
++#define IPU8_IS_MMU_M0_STREAM_NUM		16
++#define IPU8_IS_MMU_M0_L1_BLOCKNR_REG		0x54
++#define IPU8_IS_MMU_M0_L2_BLOCKNR_REG		0x94
++
++/* IS MMU Data WR Snoop */
++#define IPU8_IS_MMU_M1_OFFSET			0x273000
++#define IPU8_IS_MMU_M1_STREAM_NUM		16
++#define IPU8_IS_MMU_M1_L1_BLOCKNR_REG		0x54
++#define IPU8_IS_MMU_M1_L2_BLOCKNR_REG		0x94
++
++/* IS MMU uPipe */
++#define IPU8_IS_MMU_UPIPE_OFFSET		0x274000
++#define IPU8_IS_MMU_UPIPE_STREAM_NUM		6
++#define IPU8_IS_MMU_UPIPE_L1_BLOCKNR_REG	0x54
++#define IPU8_IS_MMU_UPIPE_L2_BLOCKNR_REG	0x6c
++
++/* IS UAO UC RD */
++#define IPU8_IS_UAO_UC_RD_OFFSET		0x27a000
++#define IPU8_IS_UAO_UC_RD_PLANENUM		4
++
++/* IS UAO UC WR */
++#define IPU8_IS_UAO_UC_WR_OFFSET		0x27b000
++#define IPU8_IS_UAO_UC_WR_PLANENUM		4
++
++/* IS UAO M0 WR */
++#define IPU8_IS_UAO_M0_WR_OFFSET		0x27c000
++#define IPU8_IS_UAO_M0_WR_PLANENUM		16
++
++/* IS UAO M1 WR */
++#define IPU8_IS_UAO_M1_WR_OFFSET		0x27d000
++#define IPU8_IS_UAO_M1_WR_PLANENUM		16
++
++/* IS UAO uPipe */
++#define IPU8_IS_UAO_UPIPE_OFFSET		0x27e000
++#define IPU8_IS_UAO_UPIPE_PLANENUM		6
++
++#define IPU8_IS_ZLX_UC_RD_OFFSET		0x275000
++#define IPU8_IS_ZLX_UC_WR_OFFSET		0x276000
++#define IPU8_IS_ZLX_M0_OFFSET			0x277000
++#define IPU8_IS_ZLX_M1_OFFSET			0x278000
++#define IPU8_IS_ZLX_UPIPE_OFFSET		0x279000
++#define IPU8_IS_ZLX_UC_RD_NUM			4
++#define IPU8_IS_ZLX_UC_WR_NUM			4
++#define IPU8_IS_ZLX_M0_NUM			16
++#define IPU8_IS_ZLX_M1_NUM			16
++#define IPU8_IS_ZLX_UPIPE_NUM			6
++
++#define IPU8_IS_MMU_NUM			5U
++
++/* PS MMU FW RD */
++#define IPU8_PS_MMU_FW_RD_OFFSET		0x148000
++#define IPU8_PS_MMU_FW_RD_STREAM_NUM		12
++#define IPU8_PS_MMU_FW_RD_L1_BLOCKNR_REG	0x54
++#define IPU8_PS_MMU_FW_RD_L2_BLOCKNR_REG	0x84
++
++/* PS MMU FW WR */
++#define IPU8_PS_MMU_FW_WR_OFFSET		0x149000
++#define IPU8_PS_MMU_FW_WR_STREAM_NUM		8
++#define IPU8_PS_MMU_FW_WR_L1_BLOCKNR_REG	0x54
++#define IPU8_PS_MMU_FW_WR_L2_BLOCKNR_REG	0x74
++
++/* PS MMU FW Data RD VC0 */
++#define IPU8_PS_MMU_SRT_RD_OFFSET		0x14a000
++#define IPU8_PS_MMU_SRT_RD_STREAM_NUM		26
++#define IPU8_PS_MMU_SRT_RD_L1_BLOCKNR_REG	0x54
++#define IPU8_PS_MMU_SRT_RD_L2_BLOCKNR_REG	0xbc
++
++/* PS MMU FW Data WR VC0 */
++#define IPU8_PS_MMU_SRT_WR_OFFSET		0x14b000
++#define IPU8_PS_MMU_SRT_WR_STREAM_NUM		26
++#define IPU8_PS_MMU_SRT_WR_L1_BLOCKNR_REG	0x54
++#define IPU8_PS_MMU_SRT_WR_L2_BLOCKNR_REG	0xbc
++
++/* PS UAO FW RD */
++#define IPU8_PS_UAO_FW_RD_OFFSET		0x156000
++#define IPU8_PS_UAO_FW_RD_PLANENUM		12
++
++/* PS UAO FW WR */
++#define IPU8_PS_UAO_FW_WR_OFFSET		0x157000
++#define IPU8_PS_UAO_FW_WR_PLANENUM		8
++
++/* PS UAO SRT RD */
++#define IPU8_PS_UAO_SRT_RD_OFFSET		0x154000
++#define IPU8_PS_UAO_SRT_RD_PLANENUM		26
++
++/* PS UAO SRT WR */
++#define IPU8_PS_UAO_SRT_WR_OFFSET		0x155000
++#define IPU8_PS_UAO_SRT_WR_PLANENUM		26
++
++#define IPU8_PS_ZLX_DATA_RD_OFFSET		0x14e000
++#define IPU8_PS_ZLX_DATA_WR_OFFSET		0x14f000
++#define IPU8_PS_ZLX_FW_RD_OFFSET		0x150000
++#define IPU8_PS_ZLX_FW_WR_OFFSET		0x151000
++#define IPU8_PS_ZLX_DATA_RD_NUM			26
++#define IPU8_PS_ZLX_DATA_WR_NUM			26
++#define IPU8_PS_ZLX_FW_RD_NUM			12
++#define IPU8_PS_ZLX_FW_WR_NUM			8
++
++#define IPU8_PS_MMU_NUM			4U
 +
 +struct ipu7_mmu_hw {
 +	char name[32];
