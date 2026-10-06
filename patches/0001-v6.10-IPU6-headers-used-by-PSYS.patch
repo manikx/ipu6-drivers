@@ -1,20 +1,20 @@
-From 8033028c584fb3926a61e9f37298c33a71d7a8cc Mon Sep 17 00:00:00 2001
+From d44811e12890dfff0e6cd4881291edd0df49af77 Mon Sep 17 00:00:00 2001
 From: Test <test@example.com>
-Date: Tue, 6 Oct 2026 11:25:22 +0530
+Date: Tue, 6 Oct 2026 17:42:01 +0530
 Subject: [PATCH] media: ipu6: Refresh vendored IPU6 headers used by PSYS
 
 ---
  drivers/media/pci/intel/ipu6/ipu6-bus.h       |  59 +++
- drivers/media/pci/intel/ipu6/ipu6-buttress.h  | 114 ++++++
+ drivers/media/pci/intel/ipu6/ipu6-buttress.h  | 113 ++++++
  drivers/media/pci/intel/ipu6/ipu6-cpd.h       | 148 +++++++
  drivers/media/pci/intel/ipu6/ipu6-dma.h       |  45 +++
  drivers/media/pci/intel/ipu6/ipu6-fw-com.h    |  47 +++
- drivers/media/pci/intel/ipu6/ipu6-mmu.h       | 215 ++++++++++
+ drivers/media/pci/intel/ipu6/ipu6-mmu.h       | 214 ++++++++++
  .../intel/ipu6/ipu6-platform-buttress-regs.h  | 343 ++++++++++++++++
  .../media/pci/intel/ipu6/ipu6-platform-regs.h | 179 +++++++++
  drivers/media/pci/intel/ipu6/ipu6.h           | 205 ++++++++++
  drivers/media/pci/intel/ipu6/ipu7-mmu-hw.h    | 369 ++++++++++++++++++
- 10 files changed, 1724 insertions(+)
+ 10 files changed, 1722 insertions(+)
  create mode 100644 drivers/media/pci/intel/ipu6/ipu6-bus.h
  create mode 100644 drivers/media/pci/intel/ipu6/ipu6-buttress.h
  create mode 100644 drivers/media/pci/intel/ipu6/ipu6-cpd.h
@@ -93,10 +93,10 @@ index 0000000..d2f93eb
 +#endif
 diff --git a/drivers/media/pci/intel/ipu6/ipu6-buttress.h b/drivers/media/pci/intel/ipu6/ipu6-buttress.h
 new file mode 100644
-index 0000000..81e0e77
+index 0000000..39c2951
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu6-buttress.h
-@@ -0,0 +1,114 @@
+@@ -0,0 +1,113 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2013--2024 Intel Corporation */
 +
@@ -104,7 +104,6 @@ index 0000000..81e0e77
 +#define IPU6_BUTTRESS_H
 +
 +#include <linux/completion.h>
-+#include <linux/dma-direction.h>
 +#include <linux/irqreturn.h>
 +#include <linux/list.h>
 +#include <linux/mutex.h>
@@ -471,10 +470,10 @@ index 0000000..b02285a
 +#endif
 diff --git a/drivers/media/pci/intel/ipu6/ipu6-mmu.h b/drivers/media/pci/intel/ipu6/ipu6-mmu.h
 new file mode 100644
-index 0000000..432073a
+index 0000000..ff11338
 --- /dev/null
 +++ b/drivers/media/pci/intel/ipu6/ipu6-mmu.h
-@@ -0,0 +1,215 @@
+@@ -0,0 +1,214 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/* Copyright (C) 2013--2026 Intel Corporation */
 +
@@ -490,7 +489,6 @@ index 0000000..432073a
 +struct device;
 +struct ipu6_mmu;
 +struct page;
-+struct ipu6_mmu;
 +
 +struct ipu6_mmu_info {
 +	struct device *dev;
